@@ -1,0 +1,181 @@
+
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	
+	<title>Facile: Niveau 1</title>
+	<meta name="description" content="Jeu Sokoban">
+	<meta name="auteur" content="Clément et Steven">
+	
+	<link rel="stylesheet" href="css/style.css">
+
+</head>
+<body id="jeu" onkeyup="AppuisTouche(event)">
+	<h1> Facile: Niveau 1 </h1>
+	<h3>Nombre de pas:<span id="Compteurdepas">0</span></h3>
+
+	<button  id="contacter" onclick="printtableau()">Lancer la partie</button>
+	<button  id="contacter" onclick="window.location='Sokobrut.html'">Retour</button>
+	<button  id="contacter" onclick="Relancer()">Relancer</button>	
+	<table id="tbltableau"></table>
+
+<script>
+Mur = "Mur"
+Sol	= "Sol"
+Objectif = "Objectif"
+Joueur = "Joueur"
+Boite = "Boite"
+var PosiJoueur = {i: 2, j:9};
+var stableau = Consttableau();
+
+function Relancer(){
+	window.location.reload();
+	setTimeout(printtableau, 6000)
+}
+
+function Consttableau() {
+	//Creation du terrain
+	var tableau = new Array(12);
+	for (var i=0; i<tableau.length; i++) {
+		tableau[i] = new Array(12);
+	}
+	//Creation du Sol et des Murs
+	for (var i=0; i<tableau.length; i++) {
+		for (var j=0; j<tableau.length; j++) {
+			var cell = {type: Sol, ElementduJeu: null};
+			//Si c'est sur les cotés alors on met des murs
+			if (i == 0 || i == tableau.length-1 || j == 0|| j == tableau[0].length-1) {
+				cell.type = Mur;
+			}
+			tableau[i][j] = cell
+
+		}
+	}
+	//Placer les Objectifs
+	tableau[3][3].type = Objectif;
+	tableau[8][8].type = Objectif;
+	//Placer le Joueur
+	tableau[PosiJoueur.i][PosiJoueur.j].ElementduJeu = Joueur;
+	//Placer les boites
+	tableau[7][2].ElementduJeu = Boite;
+	tableau[2][7].ElementduJeu = Boite;
+
+	console.log(tableau);
+	return tableau;
+}
+function printtableau() {
+	var tbltableau = document.getElementById('tbltableau');
+	var strHTLM = '';
+	for (var i=0; i<stableau.length; i++) {
+		strHTLM += "<tr>";
+		//console.log(stableau[i]);
+		for (var j=0; j<stableau.length; j++) {
+			//On passe dans le tableau cellule par cellule pour donner à chaque cellule une texture en fonction de son type défini précédement
+			var laCell = stableau[i][j];
+			var Cellule;
+			//Permet de mettre la couleur au Mur/Sol et aux objectifs
+			if (laCell.type == Sol) {
+				Cellule = "Sol";	
+			}else if (laCell.type == Mur) {
+				Cellule = "Mur";
+			}else if (laCell.type == Objectif) {
+				Cellule = "Objectif";
+			}
+			//Permettre le déplacement de cellule en cellule avec la souris
+			strHTLM += "<td class='cell"+ Cellule +"' onclick='appuis("+i+","+j+")' >";
+			//Importation de l'image du joueur si la cellule selectionnée est celle du joueur
+			if (laCell.ElementduJeu == Joueur) {
+				strHTLM += "<img src='img/Sans.png'>";
+			//Importation de l'image de la boite si la cellule selectionnée est celle de la boite
+			} else if (laCell.ElementduJeu == Boite) {
+				strHTLM += "<img src='img/Boite.png'>";
+			}
+			strHTLM += "</td>";
+		}
+		strHTLM += "</tr>";	
+	}
+	tbltableau.innerHTML = strHTLM;
+}
+
+function appuis(i,j){
+	console.log(i,j)
+	var iDiff = i - PosiJoueur.i;
+	var jDiff = j - PosiJoueur.j;
+	var DiffAbsoDei = Math.abs(i - PosiJoueur.i);
+	var DiffAbsoDej = Math.abs(j - PosiJoueur.j);
+	//Si la case est à coté du joueur alors il peut bouger
+	if ((DiffAbsoDei == 1 && DiffAbsoDej == 0) || (DiffAbsoDej == 1 && DiffAbsoDei == 0 )) {
+		//Si la case est à coté du joueur n'est pas un mur
+		if (stableau[i][j].type !== Mur) {
+			var PeuxBouger = true;
+			//Si la case est à coté du joueur est une boite
+			if (stableau[i][j].ElementduJeu == Boite) {
+				// Si la case derrière la boite n'est pas un mur ni une boite alors elle peut bouger
+				if (stableau[i+iDiff][j+jDiff].type != Mur && stableau[i+iDiff][j+jDiff].ElementduJeu == null) {
+					stableau[i][j].ElementduJeu = null;
+					stableau[i+iDiff][j+jDiff].ElementduJeu = Boite;
+				// Sinon elle ne peut pas car il y un a élément qui la bloque
+				} else {
+					console.log("Il y a un mur dernière la boite");
+					PeuxBouger = false;
+				}
+			}
+			//Permet au joueur de ce déplacer
+			if (PeuxBouger) {
+				stableau[PosiJoueur.i][PosiJoueur.j].ElementduJeu = null;
+				PosiJoueur.i = i;
+				PosiJoueur.j = j;
+				stableau[PosiJoueur.i][PosiJoueur.j].ElementduJeu = Joueur;
+				//Compte le nombre de pas aprés chaque déplacement
+
+				var Compteurdepas = document.getElementById('Compteurdepas');
+				Compteurdepas.innerHTML++;
+
+				printtableau();
+			
+			}
+		} else console.log(DiffAbsoDei, DiffAbsoDej,"Il y a un mur");
+	}else console.log(DiffAbsoDei, DiffAbsoDej,"est trop loin");
+	//Vérifie à chaque fois si les condition de victoire sont remplies
+	VictoireOuPas();
+}
+//Test de victoire
+function VictoireOuPas() {
+	var laVictoire = true;
+	for (var i=0; i<stableau.length; i++) {
+		for (var j=0; j<stableau[0].length; j++) {
+			var laCell = stableau[i][j];
+			//Si les cases Objectif ne sont pas remplis par une Boite alors la variable "LaVictoire" est mise en false
+			if (laCell.type == Objectif && laCell.ElementduJeu != Boite) laVictoire = false;
+		}
+	}
+	//Si laVictoire est true (tous les objectif sont remplis par une boite) alors on peut mettre l'alert de victoire
+	if (laVictoire) alert("Bravo, vous avez réussi ce niveau")
+}
+function AppuisTouche(event) {
+	console.log(event);
+	switch (event.keyCode){
+	//Touche fleche de gauche
+	case 37:
+		appuis(PosiJoueur.i, PosiJoueur.j-1)
+		break;
+	//Touche fleche du haut
+	case 38:
+		appuis(PosiJoueur.i-1, PosiJoueur.j)
+		break;
+	//Touche fleche de droite
+	case 39:
+		appuis(PosiJoueur.i, PosiJoueur.j+1)
+		break;
+	//Touche fleche du bas
+	case 40:
+		appuis(PosiJoueur.i+1, PosiJoueur.j)
+		break;
+	}
+}
+</script>
+
+
+</body>
+
+</html>
