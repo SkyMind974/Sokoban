@@ -1,10 +1,14 @@
 body {
     color: black; 
-    background-image: url(https://cdn.discordapp.com/attachments/606856235207360522/915984321150595082/Sans-titre.gif);
+    background-image: url(https://cdn.discordapp.com/attachments/890196503187030066/937999704350916619/211748.gif);
+    background-position:center;
+    background-repeat:no-repeat;
 }
 body#jeu{ 
     color: white; 
-    background-image: url(https://cdn.discordapp.com/attachments/606856235207360522/915984321150595082/Sans-titre.gif);
+    background-image: url(https://cdn.discordapp.com/attachments/890196503187030066/937999704350916619/211748.gif);
+    background-position:center;
+    background-repeat:no-repeat;
 }
 div#selection{
     background: linear-gradient(70deg, blue, purple,yellow,green);
@@ -15,11 +19,6 @@ div#selection{
     border-radius:20px;
     opacity: 1;
 }
-
-div.header{
-    width: 100%;
-}
-
 div#contacter{
     background: linear-gradient(70deg, blue, purple,yellow,green);
     margin: 100 auto;
@@ -59,7 +58,12 @@ div#test{
 }
 h1{
     color: black;
+    text-align:center;
+    width: 100%;
+    margin: 0 auto;
     background: linear-gradient(70deg, blue, purple,yellow,green);
+    position: sticky;
+    top: 0px;
 
 }
 h1#jeu{
